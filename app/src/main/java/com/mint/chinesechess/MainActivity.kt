@@ -1,17 +1,11 @@
 package com.mint.chinesechess
 
 import android.graphics.Color
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.ContactsContract.CommonDataKinds.Im
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.isVisible
 
 class MainActivity : AppCompatActivity() {
 
@@ -111,6 +105,8 @@ class MainActivity : AppCompatActivity() {
         val iv97: ImageView = findViewById(R.id.iv97)
         val iv98: ImageView = findViewById(R.id.iv98)
 
+        val tvDebug: TextView = findViewById(R.id.tvDebug)
+
         val listOfImageViews = listOf(
             iv00, iv01, iv02, iv03, iv04, iv05, iv06, iv07, iv08,
             iv10, iv11, iv12, iv13, iv14, iv15, iv16, iv17, iv18,
@@ -127,54 +123,53 @@ class MainActivity : AppCompatActivity() {
         //Calling this to render all chess piece
         updateBoardRender()
 
+        tvDebug.setOnClickListener {
+            tvDebug.text = "$ogYX, $targetYX, $clickStage, $selectedPieceType"
+        }
+
         for (ivYX in listOfImageViews) {
             ivYX.setOnClickListener {
                 val idOfiv = ivYX.id
                 val nameOfiv = resources.getResourceEntryName(idOfiv)           //e.g. iv46
-                val number1Ofiv = nameOfiv.substring(2, 3).toInt()              //4
-                val number2Ofiv = nameOfiv.substring(3).toInt()        //6
-                if (!playerTurnIsRed && tableArray[number1Ofiv][number2Ofiv].substring(0,3) == "Blk") {
-                    if (clickStage == 1) {
-                        ogYX = nameOfiv.substring(2)                   //46
-                        clickStage = 2
-                        //Change the selected ImageView's background color to pale green
-                        ivYX.setBackgroundColor(
-                            ContextCompat.getColor(
-                                this,
-                                R.color.selected_background_color
-                            )
-                        )
-                        //Change other ImageViews' background color to Transparent
-                        for (otherIV in listOfImageViews) {
-                            if (otherIV != ivYX) {
-                                otherIV.setBackgroundColor(Color.TRANSPARENT)
-                            }
+                val ivY = nameOfiv.substring(2, 3).toInt()              //4
+                val ivX = nameOfiv.substring(3).toInt()        //6
+                if (!playerTurnIsRed && tableArray[ivY][ivX].substring(0,3) == "Blk") {
+                    ogYX = nameOfiv.substring(2)                      //46
+                    selectedPieceType = tableArray[ivY][ivX].substring(4)
+                    clickStage = 2
+
+
+                    ivYX.setBackgroundColor(ContextCompat.getColor(this, R.color.selected_background_color))
+                    for (otherIV in listOfImageViews) {
+                        if (otherIV != ivYX) {
+                            otherIV.setBackgroundColor(Color.TRANSPARENT)
                         }
                     }
                 }
-                if (clickStage == 2 && ogYX != targetYX) {
+
+                if (!playerTurnIsRed && tableArray[ivY][ivX].substring(0,3) != "Blk" && clickStage == 2) {
                     targetYX = nameOfiv.substring(2)
-                    clickStage = 3
+                    if(targetYX!=""){
+                        when(selectedPieceType){
+                            "Chariot" -> {if(chariotMovement(ogYX, targetYX)){
+                                movePiece(ogYX, targetYX)
+                                clickStage = 1
+                            }}
+                        }
+                    }
                 }
-
-                Toast.makeText(
-                    applicationContext,
-                    "ogYX:$ogYX, targetYX:$targetYX, clickStage:$clickStage",
-                    Toast.LENGTH_SHORT
-                ).show()
-
             }
         }
-
     }
 
     var ogYX: String = ""
     var targetYX: String = ""
     var clickStage: Int = 1
+    var selectedPieceType:String  = ""
     var playerTurnIsRed: Boolean = false
     var currentNameCheck: String = ""
     var resourceName = ""
-    var tableValueHolder = ""
+    var tempValueHolder = ""
     val tableArray = arrayOf(
         arrayOf(
             "Blk_Chariot",
@@ -187,7 +182,7 @@ class MainActivity : AppCompatActivity() {
             "Blk_Horse",
             "Blk_Chariot"
         ),
-        arrayOf("Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"),
+        arrayOf("Blk_Chariot", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"),
         arrayOf(
             "Empty",
             "Blk_Cannon",
@@ -282,4 +277,72 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun movePiece(ogYX:String, targetYX: String){
+        val ogY = ogYX.substring(0,1).toInt()
+        val ogX = ogYX.substring(1).toInt()
+        var targetY = 0
+        var targetX = 0
+        if(targetYX != ""){
+            targetY = targetYX.substring(0,1).toInt()
+            targetX = targetYX.substring(1).toInt()
+
+            tableArray[targetY][targetX] = tableArray[ogY][ogX]
+            tableArray[ogY][ogX] = "Empty"
+
+            updateBoardRender()
+        }
+
+    }
+
+    fun chariotMovement(ogYX:String, targetYX:String): Boolean{
+        val ogY = ogYX.substring(0,1).toInt()
+        val ogX = ogYX.substring(1).toInt()
+        var targetY = 0
+        var targetX = 0
+        if(targetYX != ""){
+            targetY = targetYX.substring(0,1).toInt()
+            targetX = targetYX.substring(1).toInt()
+        }
+
+        val movementArray = arrayListOf<String>()
+        var editedList = listOf<String>()
+
+        if(targetYX != ""){
+            //Horizontal move
+            if (ogY == targetY) {
+                if (ogX < targetX) {                                          //e.g Black_Chariot
+                    for (column in ogX..targetX) {
+                        movementArray.add(tableArray[ogY][column])           //e.g. Black_Chariot, Empty, Empty, Red_Chariot    or Black_Chariot, Empty
+                    }
+                } else {
+                    for (column in targetX..ogX) {
+                        movementArray.add(tableArray[ogY][column])           //e.g. Black_Chariot, Empty, Empty, Red_Chariot    or Black_Chariot, Empty
+                    }
+                }
+                editedList = movementArray.drop(1).dropLast(1)
+                val tvDebug:TextView = findViewById(R.id.tvDebug)
+                return editedList.toSet().size <= 1
+            }
+
+            //Vertical move
+            if(ogX == targetX){
+                if(ogY < targetY){                      //moving down
+                    for (row in ogY..targetY){
+                        movementArray.add(tableArray[row][ogX])
+                    }
+                } else {
+                    for (row in targetY..ogY){
+                        movementArray.add(tableArray[row][ogX])
+                    }
+                }
+                editedList = movementArray.drop(1).dropLast(1)
+                val tvDebug:TextView = findViewById(R.id.tvDebug)
+                return editedList.toSet().size <= 1
+            }
+
+
+        }
+
+        return false
+    }
 }

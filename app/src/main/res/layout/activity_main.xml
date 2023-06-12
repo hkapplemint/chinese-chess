@@ -675,10 +675,15 @@
             android:layout_rowWeight="1"/>
     </GridLayout>
 
-    <View
+    <TextView
+        android:id="@+id/tvDebug"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1.6"/>
+        android:text="Black"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:padding="60dp"
+        android:layout_weight="0.01"/>
 
 
 
