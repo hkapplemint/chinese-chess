@@ -120,11 +120,25 @@ class MainActivity : AppCompatActivity() {
             iv90, iv91, iv92, iv93, iv94, iv95, iv96, iv97, iv98
         )
 
+
         //Calling this to render all chess piece
         updateBoardRender()
 
-        tvDebug.setOnClickListener {
-            tvDebug.text = "$ogYX, $targetYX, $clickStage, $selectedPieceType"
+//        tvDebug.setOnClickListener {
+//            tvDebug.text = "$ogYX, $targetYX, $clickStage, $selectedPieceType"
+//        }
+
+        val tvRestart:TextView = findViewById(R.id.tvRestart)
+        tvRestart.setOnClickListener {
+            if(clickStage==0){
+                restart()
+                tvDebug.text = "Red's turn"
+                tvDebug.setTextColor(ContextCompat.getColor(this,R.color.black))
+                for (ivYX in listOfImageViews){
+                    ivYX.setBackgroundColor(Color.TRANSPARENT)
+                }
+            }
+
         }
 
         for (ivYX in listOfImageViews) {
@@ -133,27 +147,128 @@ class MainActivity : AppCompatActivity() {
                 val nameOfiv = resources.getResourceEntryName(idOfiv)           //e.g. iv46
                 val ivY = nameOfiv.substring(2, 3).toInt()              //4
                 val ivX = nameOfiv.substring(3).toInt()        //6
-                if (!playerTurnIsRed && tableArray[ivY][ivX].substring(0,3) == "Blk") {
+
+                //Black player turn
+                if (!playerTurnIsRed && tableArray[ivY][ivX].substring(0,3) == "Blk" && clickStage!=0) {
                     ogYX = nameOfiv.substring(2)                      //46
                     selectedPieceType = tableArray[ivY][ivX].substring(4)
                     clickStage = 2
 
-
-                    ivYX.setBackgroundColor(ContextCompat.getColor(this, R.color.selected_background_color))
+                    ivYX.setBackgroundColor(ContextCompat.getColor(this, R.color.selected_background_color_semitransparent))
                     for (otherIV in listOfImageViews) {
                         if (otherIV != ivYX) {
                             otherIV.setBackgroundColor(Color.TRANSPARENT)
                         }
                     }
                 }
-
                 if (!playerTurnIsRed && tableArray[ivY][ivX].substring(0,3) != "Blk" && clickStage == 2) {
                     targetYX = nameOfiv.substring(2)
                     if(targetYX!=""){
                         when(selectedPieceType){
                             "Chariot" -> {if(chariotMovement(ogYX, targetYX)){
-                                movePiece(ogYX, targetYX)
+                                tvDebug.text = "Red's turn"
                                 clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Cannon" -> {if(cannonMovement(ogYX, targetYX)){
+                                tvDebug.text = "Red's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Horse" -> {if(horseMovement(ogYX, targetYX)){
+                                tvDebug.text = "Red's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Elephant" -> {if(elephantMovement(ogYX, targetYX, !playerTurnIsRed)){
+                                tvDebug.text = "Red's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Soldier" -> {if(soldierMovement(ogYX, targetYX, !playerTurnIsRed)){
+                                tvDebug.text = "Red's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Advisor" -> {if(advisorMovement(ogYX, targetYX, !playerTurnIsRed)){
+                                tvDebug.text = "Red's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "General" -> {if(generalMovement(ogYX, targetYX, !playerTurnIsRed)){
+                                tvDebug.text = "Red's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                        }
+                    }
+                }
+
+                //Red player turn
+                if (playerTurnIsRed && tableArray[ivY][ivX].substring(0,3) == "Red" && clickStage!=0) {
+                    ogYX = nameOfiv.substring(2)                      //46
+                    selectedPieceType = tableArray[ivY][ivX].substring(4)
+                    clickStage = 2
+
+                    ivYX.setBackgroundColor(ContextCompat.getColor(this, R.color.selected_background_color_semitransparent))
+                    for (otherIV in listOfImageViews) {
+                        if (otherIV != ivYX) {
+                            otherIV.setBackgroundColor(Color.TRANSPARENT)
+                        }
+                    }
+                }
+                if (playerTurnIsRed && tableArray[ivY][ivX].substring(0,3) != "Red" && clickStage == 2) {
+                    targetYX = nameOfiv.substring(2)
+                    if(targetYX!=""){
+                        when(selectedPieceType){
+                            "Chariot" -> {if(chariotMovement(ogYX, targetYX)){
+                                tvDebug.text = "Black's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Cannon" -> {if(cannonMovement(ogYX, targetYX)){
+                                tvDebug.text = "Black's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Horse" -> {if(horseMovement(ogYX, targetYX)){
+                                tvDebug.text = "Black's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Elephant" -> {if(elephantMovement(ogYX, targetYX, !playerTurnIsRed)){
+                                tvDebug.text = "Black's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Soldier" -> {if(soldierMovement(ogYX, targetYX, !playerTurnIsRed)){
+                                tvDebug.text = "Black's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "Advisor" -> {if(advisorMovement(ogYX, targetYX, !playerTurnIsRed)){
+                                tvDebug.text = "Black's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
+                            }}
+                            "General" -> {if(generalMovement(ogYX, targetYX, !playerTurnIsRed)){
+                                tvDebug.text = "Black's turn"
+                                clickStage = 1
+                                movePiece(ogYX, targetYX)
+                                playerTurnIsRed = !playerTurnIsRed
                             }}
                         }
                     }
@@ -162,15 +277,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //Setting up the variables
     var ogYX: String = ""
     var targetYX: String = ""
     var clickStage: Int = 1
     var selectedPieceType:String  = ""
-    var playerTurnIsRed: Boolean = false
+    var playerTurnIsRed: Boolean = true
     var currentNameCheck: String = ""
     var resourceName = ""
-    var tempValueHolder = ""
-    val tableArray = arrayOf(
+    var tableArray = arrayOf(
         arrayOf(
             "Blk_Chariot",
             "Blk_Horse",
@@ -182,7 +297,7 @@ class MainActivity : AppCompatActivity() {
             "Blk_Horse",
             "Blk_Chariot"
         ),
-        arrayOf("Blk_Chariot", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"),
+        arrayOf("Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"),
         arrayOf(
             "Empty",
             "Blk_Cannon",
@@ -243,7 +358,88 @@ class MainActivity : AppCompatActivity() {
         )
     )
 
+    val tableArrayCopy = arrayOf(
+        arrayOf(
+            "Blk_Chariot",
+            "Blk_Horse",
+            "Blk_Elephant",
+            "Blk_Advisor",
+            "Blk_General",
+            "Blk_Advisor",
+            "Blk_Elephant",
+            "Blk_Horse",
+            "Blk_Chariot"
+        ),
+        arrayOf("Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"),
+        arrayOf(
+            "Empty",
+            "Blk_Cannon",
+            "Empty",
+            "Empty",
+            "Empty",
+            "Empty",
+            "Empty",
+            "Blk_Cannon",
+            "Empty"
+        ),
+        arrayOf(
+            "Blk_Soldier",
+            "Empty",
+            "Blk_Soldier",
+            "Empty",
+            "Blk_Soldier",
+            "Empty",
+            "Blk_Soldier",
+            "Empty",
+            "Blk_Soldier"
+        ),
+        arrayOf("Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"),
+        arrayOf("Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"),
+        arrayOf(
+            "Red_Soldier",
+            "Empty",
+            "Red_Soldier",
+            "Empty",
+            "Red_Soldier",
+            "Empty",
+            "Red_Soldier",
+            "Empty",
+            "Red_Soldier"
+        ),
+        arrayOf(
+            "Empty",
+            "Red_Cannon",
+            "Empty",
+            "Empty",
+            "Empty",
+            "Empty",
+            "Empty",
+            "Red_Cannon",
+            "Empty"
+        ),
+        arrayOf("Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"),
+        arrayOf(
+            "Red_Chariot",
+            "Red_Horse",
+            "Red_Elephant",
+            "Red_Advisor",
+            "Red_General",
+            "Red_Advisor",
+            "Red_Elephant",
+            "Red_Horse",
+            "Red_Chariot"
+        )
+    )
+
+    fun restart(){
+        tableArray = tableArrayCopy
+        clickStage = 1
+        playerTurnIsRed = true
+        updateBoardRender()
+    }
+
     fun updateBoardRender() {
+
         //Looping to render the chess piece
         for (row in 0..9) {
             for (column in 0..8) {
@@ -285,6 +481,18 @@ class MainActivity : AppCompatActivity() {
         if(targetYX != ""){
             targetY = targetYX.substring(0,1).toInt()
             targetX = targetYX.substring(1).toInt()
+
+            val tvDebug:TextView = findViewById(R.id.tvDebug)
+            if(tableArray[targetY][targetX]=="Red_General"){
+                tvDebug.text = "Black Wins!"
+                tvDebug.setTextColor(ContextCompat.getColor(this,R.color.lime_green))
+                clickStage = 0
+            }
+            if(tableArray[targetY][targetX]=="Blk_General"){
+                tvDebug.text = "Red Wins!"
+                tvDebug.setTextColor(ContextCompat.getColor(this,R.color.lime_green))
+                clickStage = 0
+            }
 
             tableArray[targetY][targetX] = tableArray[ogY][ogX]
             tableArray[ogY][ogX] = "Empty"
@@ -345,4 +553,328 @@ class MainActivity : AppCompatActivity() {
 
         return false
     }
+
+    fun cannonMovement(ogYX: String, targetYX: String): Boolean{
+        val ogY = ogYX.substring(0,1).toInt()
+        val ogX = ogYX.substring(1).toInt()
+        var targetY = 0
+        var targetX = 0
+        if(targetYX != ""){
+            targetY = targetYX.substring(0,1).toInt()
+            targetX = targetYX.substring(1).toInt()
+        }
+
+        val movementArray = arrayListOf<String>()
+        var editedList = listOf<String>()
+
+        if (tableArray[targetY][targetX] == "Empty"){             //for
+            if(ogY == targetY){                                   //horizontal move in "Empty" move
+                if(ogX < targetX){
+                    for (column in ogX..targetX){
+                        movementArray.add(tableArray[ogY][column])
+                    }
+                } else {
+                    for (column in targetX..ogX){
+                        movementArray.add(tableArray[ogY][column])
+                    }
+                }
+                editedList = movementArray.drop(1).dropLast(1)
+                if(editedList.toSet().size == 1 && "Empty" in editedList.toSet()){
+                    return true
+                } else if (editedList.toSet().size == 0){
+                    return true
+                }
+                return false
+            }
+            if(ogX == targetX){
+                if(ogY < targetY){
+                    for (row in ogY..targetY){
+                        movementArray.add(tableArray[row][ogX])
+                    }
+                } else {
+                    for (row in targetY..ogY){
+                        movementArray.add(tableArray[row][ogX])
+                    }
+                }
+                editedList = movementArray.drop(1).dropLast(1)
+
+                if(editedList.toSet().size == 1 && "Empty" in editedList.toSet()){
+                    return true
+                } else if (editedList.toSet().size == 0){
+                    return true
+                }
+                return false
+            }
+        }
+
+        if (tableArray[targetY][targetX] != "Empty"){
+            if(ogY == targetY){                                   //horizontal move in "Empty" move
+                if(ogX < targetX){
+                    for (column in ogX..targetX){
+                        movementArray.add(tableArray[ogY][column])
+                    }
+                } else {
+                    for (column in targetX..ogX){
+                        movementArray.add(tableArray[ogY][column])
+                    }
+                }
+                editedList = movementArray.drop(1).dropLast(1)
+                if(editedList.toSet().size == 2 && "Empty" in editedList.toSet()){
+                    return true
+                } else if (editedList.toSet().size == 1 && "Empty" !in editedList.toSet()){
+                    return true
+                }
+                return false
+            }
+            if(ogX == targetX){
+                if(ogY < targetY){
+                    for (row in ogY..targetY){
+                        movementArray.add(tableArray[row][ogX])
+                    }
+                } else {
+                    for (row in targetY..ogY){
+                        movementArray.add(tableArray[row][ogX])
+                    }
+                }
+                editedList = movementArray.drop(1).dropLast(1)
+
+                if(editedList.toSet().size == 2 && "Empty" in editedList.toSet()){
+                    return true
+                } else if (editedList.toSet().size == 1 && "Empty" !in editedList.toSet()){
+                    return true
+                }
+                return false
+            }
+        }
+        return false
+    }
+
+    fun horseMovement(ogYX: String, targetYX: String): Boolean{
+        val ogY = ogYX.substring(0,1).toInt()
+        val ogX = ogYX.substring(1).toInt()
+        var targetY = 0
+        var targetX = 0
+        if(targetYX != ""){
+            targetY = targetYX.substring(0,1).toInt()
+            targetX = targetYX.substring(1).toInt()
+        }
+
+        if(ogX+2 == targetX && ogY+1 == targetY && tableArray[ogY][ogX+1] == "Empty"){
+            return true
+        }
+        if(ogX+2 == targetX && ogY-1 == targetY && tableArray[ogY][ogX+1] == "Empty"){
+            return true
+        }
+
+        if(targetX+2 == ogX && ogY+1 == targetY && tableArray[ogY][ogX-1] == "Empty"){
+            return true
+        }
+        if(targetX+2 == ogX && ogY-1 == targetY && tableArray[ogY][ogX-1] == "Empty"){
+            return true
+        }
+
+        if(ogY+2 == targetY && ogX+1 == targetX && tableArray[ogY+1][ogX] == "Empty"){
+            return true
+        }
+        if(ogY+2 == targetY && ogX-1 == targetX && tableArray[ogY+1][ogX] == "Empty"){
+            return true
+        }
+
+        if(targetY+2 == ogY && ogX+1 == targetX && tableArray[ogY-1][ogX] == "Empty"){
+            return true
+        }
+        if(targetY+2 == ogY && ogX-1 == targetX && tableArray[ogY-1][ogX] == "Empty"){
+            return true
+        }
+
+
+        return false
+    }
+
+    fun elephantMovement(ogYX: String, targetYX: String, isBlack:Boolean): Boolean {
+        val ogY = ogYX.substring(0, 1).toInt()
+        val ogX = ogYX.substring(1).toInt()
+        var targetY = 0
+        var targetX = 0
+        if (targetYX != "") {
+            targetY = targetYX.substring(0, 1).toInt()
+            targetX = targetYX.substring(1).toInt()
+        }
+
+        val tvDebug: TextView = findViewById(R.id.tvDebug)
+
+        if (ogX + 2 == targetX && ogY + 2 == targetY && tableArray[ogY + 1][ogX + 1] == "Empty") {
+            if(!isBlack && targetY>=5){
+                return true
+            }
+            if(isBlack && targetY<=4){
+                tvDebug.text = "Case1"
+                return true
+            }
+        }
+
+        if (ogX - 2 == targetX && ogY + 2 == targetY && tableArray[ogY + 1][ogX - 1] == "Empty") {
+            if(!isBlack && targetY>=5){
+                return true
+            }
+            if(isBlack && targetY<=4){
+                tvDebug.text = "Case2"
+                return true
+            }
+        }
+
+        if (ogX + 2 == targetX && ogY - 2 == targetY && tableArray[ogY - 1][ogX + 1] == "Empty") {
+            if(!isBlack && targetY>=5){
+                return true
+            }
+            if(isBlack && targetY<=4){
+                tvDebug.text = "Case3"
+                return true
+            }
+        }
+
+        if (ogX - 2 == targetX && ogY - 2 == targetY && tableArray[ogY - 1][ogX - 1] == "Empty") {
+            if(!isBlack && targetY>=5){
+                return true
+            }
+            if(isBlack && targetY<=4){
+                tvDebug.text = "Case4"
+                return true
+            }
+        }
+
+        return false
+    }
+
+    fun soldierMovement(ogYX: String, targetYX: String, isBlack:Boolean): Boolean {
+        val ogY = ogYX.substring(0, 1).toInt()
+        val ogX = ogYX.substring(1).toInt()
+        var targetY = 0
+        var targetX = 0
+        if (targetYX != "") {
+            targetY = targetYX.substring(0, 1).toInt()
+            targetX = targetYX.substring(1).toInt()
+        }
+
+        if(isBlack){
+            if(ogY<=4 && ogY+1==targetY && ogX==targetX){
+                return true
+            }
+            if(ogY>=5 && ogY+1==targetY && ogX==targetX){
+                return true
+            }
+            if(ogY>=5 && ogX+1==targetX && ogY==targetY){
+                return true
+            }
+            if(ogY>=5 && ogX-1==targetX && ogY==targetY){
+                return true
+            }
+        } else {
+            if(ogY>=5 && ogY-1==targetY && ogX==targetX){
+                return true
+            }
+            if(ogY<=4 && ogY-1==targetY && ogX==targetX){
+                return true
+            }
+            if(ogY<=4 && ogX+1==targetX && ogY==targetY){
+                return true
+            }
+            if(ogY<=4 && ogX-1==targetX && ogY==targetY){
+                return true
+            }
+        }
+
+
+
+        return false
+    }
+
+    fun advisorMovement(ogYX: String, targetYX: String, isBlack:Boolean): Boolean {
+        val ogY = ogYX.substring(0, 1).toInt()
+        val ogX = ogYX.substring(1).toInt()
+        var targetY = 0
+        var targetX = 0
+        if (targetYX != "") {
+            targetY = targetYX.substring(0, 1).toInt()
+            targetX = targetYX.substring(1).toInt()
+        }
+
+        if(isBlack){
+            if(targetY<=2 && 3<=targetX && targetX<=5){
+                if(ogY+1==targetY && ogX+1==targetX){
+                    return true
+                }
+                if(ogY-1==targetY && ogX+1==targetX){
+                    return true
+                }
+                if(ogY+1==targetY && ogX-1==targetX){
+                    return true
+                }
+                if(ogY-1==targetY && ogX-1==targetX){
+                    return true
+                }
+            }
+        } else {
+            if(7<=targetY && targetY<=9 && 3<=targetX && targetX<=5){
+                if(ogY+1==targetY && ogX+1==targetX){
+                    return true
+                }
+                if(ogY-1==targetY && ogX+1==targetX){
+                    return true
+                }
+                if(ogY+1==targetY && ogX-1==targetX){
+                    return true
+                }
+                if(ogY-1==targetY && ogX-1==targetX){
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    fun generalMovement(ogYX: String, targetYX: String, isBlack:Boolean): Boolean {
+        val ogY = ogYX.substring(0, 1).toInt()
+        val ogX = ogYX.substring(1).toInt()
+        var targetY = 0
+        var targetX = 0
+        if (targetYX != "") {
+            targetY = targetYX.substring(0, 1).toInt()
+            targetX = targetYX.substring(1).toInt()
+        }
+
+        if(isBlack){
+            if(targetY<=2 && 3<=targetX && targetX<=5){
+                if(ogY-1==targetY && ogX==targetX){
+                    return true
+                }
+                if(ogY+1==targetY && ogX==targetX){
+                    return true
+                }
+                if(ogY==targetY && ogX-1==targetX){
+                    return true
+                }
+                if(ogY==targetY && ogX+1==targetX){
+                    return true
+                }
+            }
+        } else {
+            if(7<=targetY && targetY<=9 && 3<=targetX && targetX<=5){
+                if(ogY-1==targetY && ogX==targetX){
+                    return true
+                }
+                if(ogY+1==targetY && ogX==targetX){
+                    return true
+                }
+                if(ogY==targetY && ogX-1==targetX){
+                    return true
+                }
+                if(ogY==targetY && ogX+1==targetX){
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
 }
